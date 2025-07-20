@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="description" content="An interactive stylist's journey journal – live YAML-powered chapters with quizzes, worksheets and reflection prompts." />
+    <title>Enhanced Chapter Template – Live YAML</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"/>
+
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
+
+    <script crossorigin src="https://cdn.jsdelivr.net/npm/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
+
+    <style>
+        /* Font Assignments */
+        .font-cinzel {
+            font-family: 'Cinzel Decorative', serif;
+        }
+        .font-libre {
+            font-family: 'Libre Baskerville', Georgia, serif;
+        }
+        .font-libre-bold {
+            font-family: 'Libre Baskerville', Georgia, serif;
+            font-weight: 700;
+        }
+        .font-libre-italic {
+            font-family: 'Libre Baskerville', Georgia, serif;
+            font-style: italic;
+        }
+        /* Custom Styles */
+        .chapter-container {
+            max-width: 650px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+        .chapter-numeral-bg {
+            width: 120px;
+            height: 80px;
+            background: linear-gradient(45deg, #1797a6, #26a69a);
+            border-radius: 50% 30% 50% 30%;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 8px rgba(23, 151, 166, 0.3);
+        }
+        .chapter-numeral {
+            font-size: 3rem;
+            color: #222;
+            position: relative;
+            top: 0.5rem;
+        }
+        .title-stack {
+            display: flex;
+            align-items: flex-start;
+        }
+        .title-line {
+            font-size: 2.25rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            line-height: 1.1;
+            margin: 0;
+            color: #1797a6;
+        }
+        .vertical-line {
+            width: 3px;
+            background-color: #222;
+            margin-right: 1rem;
+            height: 250px;
+        }
+        .bible-quote-container {
+            margin: 2rem auto;
+            max-width: 400px;
+            padding: 1.5rem 2rem;
+            border: 2px solid #1797a6;
+            border-radius: 50px;
+            background-color: #f8fffe;
+            text-align: center;
+            box-shadow: 6px 6px 12px rgba(23, 151, 166, 0.3), 0 2px 4px rgba(23, 151, 166, 0.1);
+            transform: perspective(100px) rotateX(2deg);
+        }
+        .bible-quote-text {
+            font-size: 1.125rem;
+            margin-bottom: 0.5rem;
+            line-height: 1.5;
+        }
+        .bible-quote-reference {
+            font-size: 1rem;
+            color: #666;
+        }
+        .drop-cap {
+            float: left;
+            font-size: 4rem;
+            line-height: 1;
+            margin-right: 0.5rem;
+            color: #1797a6;
+            background: rgba(23, 151, 166, 0.1);
+            padding: 0.2rem 0.4rem;
+            border-radius: 8px;
+        }
+        .introduction-text {
+            text-align: justify;
+            margin: 1rem 0;
+            line-height: 1.6;
+        }
+        .quiz-question {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background-color: #f8fffe;
+            border-radius: 8px;
+            border: 1px solid #e0f2f1;
+        }
+        .worksheet-section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .rating-circle {
+            width: 2.5rem;
+            height: 2.5rem;
+            border: 2px solid #ccc;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .rating-circle.selected {
+            background-color: #1797a6;
+            color: white;
+            border-color: #1797a6;
+        }
+        .rating-circle:focus-visible {
+            outline: 2px solid #0d9488;
+            outline-offset: 2px;
+        }
+        .nav-button {
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+        .nav-button.active {
+            background-color: #0d9488;
+            color: white;
+        }
+        .nav-button:not(.active) {
+            color: #4b5563;
+            background-color: transparent;
+        }
+        .nav-button:not(.active):hover {
+            background-color: #ccfbf1;
+        }
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            font-size: 1.125rem;
+            color: #6b7280;
+        }
+        .content-area {
+            line-height: 1.6;
+            color: #333;
+        }
+        .content-area p {
+            margin: 1em 0;
+            text-align: justify;
+        }
+        .content-area h3 {
+            margin-top: 1.5em;
+            margin-bottom: 0.5em;
+            line-height: 1.2;
+            color: #1797a6;
+        }
+        .content-area blockquote {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            border-left: 4px solid #1797a6;
+            background-color: #f8fffe;
+            font-style: italic;
+        }
+        .content-area blockquote footer {
+            text-align: right;
+            font-style: normal;
+            font-weight: bold;
+        }
+        .endnotes {
+            margin-top: 3rem;
+        }
+        .endnotes h3 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            color: #1797a6;
+        }
+        .endnote-item {
+            margin-bottom: 0.5rem;
+            text-align: left;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        .closing-flourish {
+            color: #1797a6;
+            font-size: 1.5rem;
+            letter-spacing: 0.5em;
+        }
+        .closing-image-placeholder {
+            width: 100%;
+            height: 300px;
+            background: linear-gradient(135deg, #1797a6, #26a69a);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 16px rgba(23, 151, 166, 0.3);
+        }
+        .closing-image-text {
+            color: white;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        .closing-caption {
+            font-size: 0.85rem;
+            color: #888;
+            font-style: italic;
+        }
+        .toast {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            background-color: #ef4444;
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            z-index: 1000;
+            max-width: 300px;
+            transition: opacity 0.3s ease-in-out;
+        }
+        .toast-hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        @media print {
+            .sticky { display: none !important; }
+            .chapter-container { padding: 0; margin: 0; }
+            .worksheet-section { box-shadow: none; border: 1px solid #ccc; }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"><p>Part I: Foundations of Creative Hairstyling
+Chapters I—III &gt; Every masterpiece begins with a single stroke. As
+you turn these pages, you’re not just learning techniques—you’re
+unlocking the artistic legacy that flows through generations of
+visionary stylists. Here, in the crucible where science meets artistry,
+you’ll discover why certain cuts create movement, how color theory
+transforms ordinary into extraordinary, and when to trust the intuition
+that separates good stylists from legends. &gt; &gt; These foundational
+chapters aren’t merely about holding scissors—they’re about wielding the
+power to transform not just hair, but confidence, identity, and
+self-expression. Whether you’re standing behind your first chair or
+seeking to reinvigorate decades of experience, these timeless principles
+will become the compass guiding your creative journey through every
+trend, every client, and every challenge that lies ahead. &gt; Previous
+| Next</p></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        /* ---------- Mock Data ---------- */
+        const mockBookMap = {
+            title: "Curls & Contemplation: A Stylist's Interactive Journey Journal",
+            chapters: [
+                { id: "chapter-i", title: "Unveiling Your Creative Odyssey", file: "9-Chapter-I-Unveiling-Your-Creative-Odyssey.yaml", roman_numeral: "I" },
+                { id: "chapter-ii", title: "Refining Your Creative Toolkit", file: "10-Chapter-II-Refining-Your-Creative-Toolkit.yaml", roman_numeral: "II" },
+                { id: "chapter-iii", title: "Reigniting Your Creative Fire", file: "11-Chapter-III-Reigniting-Your-Creative-Fire.yaml", roman_numeral: "III" }
+            ]
+        };
+
+        const mockChapterData = {
+            "chapter-i": { title_full: "Chapter I", content: "" },
+            "chapter-ii": { title_full: "Chapter II", content: "" }
+        };
+
+        /* More script omitted for brevity */
+    </script>
+</body>
+</html>
