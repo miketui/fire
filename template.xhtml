@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="$lang$" lang="$lang$">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  $if(description)$
+  <meta name="description" content="$description$" />
+  $endif$
+  $if(author)$
+  <meta name="author" content="$for(author)$$author$$sep$, $endfor$" />
+  $endif$
+  <title>$title$</title>
+
+  <!-- External Fonts and CSS -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&amp;family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+
+  <!-- External JavaScript Libraries -->
+  <script crossorigin="" src="https://cdn.jsdelivr.net/npm/react@18/umd/react.production.min.js"></script>
+  <script crossorigin="" src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
+
+  <!-- Custom Stylesheet Link -->
+  $if(css)$
+  $for(css)$
+  <link rel="stylesheet" href="$css$" />
+  $endfor$
+  $endif$
+
+  <!-- Inline styles from the original template are assumed to be in the external CSS file -->
+</head>
+<body>
+  <!--
+    The main content from your Markdown file will be rendered here.
+    This includes the chapter title, quotes, introduction, main body,
+    and any other content you have written.
+  -->
+  $if(title)$
+  <header>
+    <h1>$title$</h1>
+  </header>
+  $endif$
+
+  <main>
+    $body$
+  </main>
+
+  <!--
+    If you want to add interactive React components, you would typically
+    have a placeholder div like this and a separate JS file to mount the app.
+    For a static build with Pandoc, the content is generated server-side.
+    The interactive elements from your original template would need to be
+    loaded via a separate script.
+  -->
+  <div id="root"></div>
+
+  <!--
+    The Babel script from your original template suggests client-side rendering.
+    To make this work with Pandoc, you would keep your React code in a separate
+    .js file and link to it here. The YAML data could be passed to the script.
+  -->
+  $if(interactive-script)$
+  <script type="text/babel" src="$interactive-script$"></script>
+  $endif$
+</body>
+</html>
